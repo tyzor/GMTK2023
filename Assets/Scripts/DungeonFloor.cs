@@ -3,19 +3,11 @@ using System.Collections;
 
 public class DungeonFloor: MonoBehaviour
 {
-	public enum TileType
-	{
-		Wall,
-		Floor,
-		Entrance,
-		Exit
-	}
-
 	public int mapWidth = 10;
 	public int mapHeight = 10;
 
 	[SerializeField]
-	private TileType[] mapData;
+	private MapTile.TileType[] mapData;
 
 	[SerializeField]
 	private GameObject floorPrefab;
@@ -46,11 +38,13 @@ public class DungeonFloor: MonoBehaviour
 	void LoadFromFile(string filename)
 	{
         var textFile = Resources.Load<TextAsset>(filename);
-		string[] mapLines = textFile.text.Split("\n");
+		string mapString = textFile.text.Replace("\r","");
+
+		string[] mapLines = mapString.Split("\n");
 
 		mapWidth = mapLines[0].Length;
 		mapHeight = mapLines.Length;
-		mapData = new TileType[mapWidth * mapHeight];
+		mapData = new MapTile.TileType[mapWidth * mapHeight];
 
 		Debug.Log($"width {mapWidth} height {mapHeight}");
 
@@ -59,19 +53,19 @@ public class DungeonFloor: MonoBehaviour
 			for (int y = 0; y < mapHeight; y++)
 			{
 				var tileChar = mapLines[y][x];
-				TileType newTile = TileType.Wall;
+				MapTile.TileType newTile = MapTile.TileType.Wall;
 				if(tileChar == 'W')
 				{
-					newTile = TileType.Wall;
+					newTile = MapTile.TileType.Wall;
 				} else if(tileChar == 'S')
 				{
-					newTile = TileType.Entrance;
+					newTile = MapTile.TileType.Entrance;
 				} else if(tileChar == 'E')
 				{
-					newTile = TileType.Exit;
+					newTile = MapTile.TileType.Exit;
 				} else if(tileChar == '.')
 				{
-					newTile = TileType.Floor;
+					newTile = MapTile.TileType.Floor;
 				}
 				mapData[(mapHeight - 1 - y) * mapWidth + x] = newTile;
 	
@@ -93,9 +87,9 @@ public class DungeonFloor: MonoBehaviour
             for (int y = 0; y < mapHeight; y++)
             {
 				var mapTile = mapData[y*mapWidth + x];
-				if (mapTile == TileType.Floor
-					|| mapTile == TileType.Entrance
-					|| mapTile == TileType.Exit)
+				if (mapTile == MapTile.TileType.Floor
+					|| mapTile == MapTile.TileType.Entrance
+					|| mapTile == MapTile.TileType.Exit)
 				{
 					float px = (x * tileSize.x);
 					float py = (y * tileSize.z);
@@ -108,7 +102,7 @@ public class DungeonFloor: MonoBehaviour
 					continue;
 ;               }
 
-				if (mapTile == TileType.Wall)
+				if (mapTile == MapTile.TileType.Wall)
 				{
 					// Put dirt on top to simulate the ground
 					float px = (x * tileSize.x);
@@ -129,16 +123,16 @@ public class DungeonFloor: MonoBehaviour
         Bounds floorBounds = floorPrefab.GetComponent<MeshRenderer>().bounds;
         Vector3 tileSize = floorBounds.size;
 
-		TileType tile = getMapTile(x,y);
+		MapTile.TileType tile = getMapTile(x,y);
 
         // North Wall
-		if( tile == TileType.Exit )
+		if( tile == MapTile.TileType.Exit )
 		{
             float px = x * tileSize.x;
             float py = y * tileSize.z + floorBounds.extents.z;
             Instantiate(wallDoorPrefab, new Vector3(px, 0, py), Quaternion.identity, parent.transform);
         }
-        else if (y >= mapHeight-1 || getMapTile(x,y+1) == TileType.Wall )
+        else if (y >= mapHeight-1 || getMapTile(x,y+1) == MapTile.TileType.Wall )
 		{
 			float px = x * tileSize.x;
 			float py = y * tileSize.z + floorBounds.extents.z;
@@ -146,13 +140,13 @@ public class DungeonFloor: MonoBehaviour
 		}
 
         // South Wall
-		if( tile == TileType.Entrance )
+		if( tile == MapTile.TileType.Entrance )
 		{
             float px = x * tileSize.x;
             float py = y * tileSize.z - floorBounds.extents.z;
             Instantiate(wallDoorPrefab, new Vector3(px, 0, py), Quaternion.identity, parent.transform);
         }
-        else if (y <= 0 || getMapTile(x,y-1) == TileType.Wall)
+        else if (y <= 0 || getMapTile(x,y-1) == MapTile.TileType.Wall)
         {
             float px = x * tileSize.x;
             float py = y * tileSize.z - floorBounds.extents.z;
@@ -160,7 +154,7 @@ public class DungeonFloor: MonoBehaviour
         }
 
         // East Wall
-        if (x >= mapWidth - 1 || getMapTile(x+1,y) == TileType.Wall)
+        if (x >= mapWidth - 1 || getMapTile(x+1,y) == MapTile.TileType.Wall)
         {
             float px = x * tileSize.x + floorBounds.extents.x;
 			float py = y * tileSize.z;
@@ -169,7 +163,7 @@ public class DungeonFloor: MonoBehaviour
         }
 
         // West Wall
-        if (x <= 0 || getMapTile(x-1,y) == TileType.Wall)
+        if (x <= 0 || getMapTile(x-1,y) == MapTile.TileType.Wall)
         {
             float px = x * tileSize.x - floorBounds.extents.x;
             float py = y * tileSize.z;
@@ -178,7 +172,7 @@ public class DungeonFloor: MonoBehaviour
 
     }
 
-	public TileType getMapTile(int x, int y)
+	public MapTile.TileType getMapTile(int x, int y)
 	{
 		return mapData[mapWidth * y + x];
 
