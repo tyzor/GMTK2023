@@ -1,0 +1,20 @@
+Theme: Role Reversal
+
+Idea: You are the AI/Designer and have to keep the hero entertained/motivated, you will draft dungeon pieces to place down
+as the hero progresses through the game.
+
+Hero will have attributes:
+    - health - if the hero dies the game is over (lose)
+    - boredom - if the hero reaches max boredom they leave the dungeon (lose)
+        - increases as the hero stays at max health or does not find loot
+    - xp - increases every time a monster is defeated?
+        - 100 xp = new level and hero gains stats (just hp for now)
+
+
+    - other traits? 
+        - greedy -> hero will always go for loot 
+        - heroic -> hero will seek out every monster on the level
+        - speedrunner -> hero will find the fastest path to the exit
+
+
+Dungeon tiles should be premade pieces that have an entrance and exit
